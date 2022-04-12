@@ -6,10 +6,10 @@ Bitcoin (bitcoind) Container
 ---
 See [Dockerfile](./docker/bitcoind/Dockerfile)
 ### Dockerfile Argument Values
-|Key|Default Values|Info|
-|---|---|---|
-|BITCOIN_VERSION|0.17.0.1|Bitcoin version to use|
-|USER_ID|1000|The run container as bitcoin UID. Make this the same as the local directory UID permissions |
+|Key|Default Values|Info|Required|
+|---|---|---|---|
+|BITCOIN_VERSION|n/a|Bitcoin version to use|yes|
+|USER_ID|1000|The run container as bitcoin UID. Make this the same as the local directory UID permissions|no
 
 ### Container Environment Values
 -----
