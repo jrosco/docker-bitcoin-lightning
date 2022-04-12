@@ -1,0 +1,6 @@
+[submodule "lnd"]
+	path = lnd
+	url = https://github.com/lightningnetwork/lnd.git
+#[submodule "docker/lnd/lnd_src"]
+#	path = docker/lnd/lnd_src
+#	url = https://github.com/lightningnetwork/lnd.git

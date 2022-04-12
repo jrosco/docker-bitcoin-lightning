@@ -1,0 +1,22 @@
+[Unit]
+Description=Bitcoin network Application Container
+Documentation=https://github.com/jrosco/lightning-node
+After=network-online.target docker.socket firewalld.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=notify
+ExecStart=/root/lightning-node-master/bin/bitcoind.sh start
+ExecReload=/root/lightning-node-master/bin/bitcoind.sh restart
+TasksMax=infinity
+TimeoutStartSec=10
+# set delegate yes so that systemd does not reset the cgroups of docker containers
+Delegate=yes
+KillMode=process
+Restart=on-failure
+StartLimitBurst=3
+StartLimitInterval=60s
+
+[Install]
+WantedBy=multi-user.target
