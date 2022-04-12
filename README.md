@@ -1,6 +1,6 @@
 # Lightning Node Docker Container Stack
 
-Repo for spinning up your own Lightning Node Stack (bitcoind, lnd, neutrino)
+Repo for spinning up your own Lightning Node Stack (bitcoind, lnd, neutrino) with docker
 
 Bitcoin (bitcoind) Container 
 ---
