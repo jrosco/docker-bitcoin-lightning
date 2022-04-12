@@ -9,7 +9,7 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 |Key|Default Values|Info|Required|
 |---|---|---|---|
 |BITCOIN_VERSION|n/a|Bitcoin version to use|yes|
-|USER_ID|1000|The run container as bitcoin UID. Make this the same as the local directory UID permissions|no
+|USER_ID|1000|The run container as bitcoin UID. Make this the same as the local directory UID permissions | no
 
 ### Container Environment Values
 -----
@@ -27,10 +27,6 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 ---
 ### Docker Build
 ---
-```bash
-docker build -t bitcoind .
-```
-Build with differnet Bitcoin version
 ```bash
 docker build --build-arg BITCOIN_VERSION=0.16.3 -t bitcoind .
 ```

@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
 ARG BITCOIN_VERSION
 ARG USER_ID=1000
@@ -17,11 +17,11 @@ RUN set -ex \
     && wget -q https://bitcoin.org/laanwj-releases.asc \
     && SHA256=`grep "${BITCOIN_ARCHIVE}" SHA256SUMS.asc | awk '{print $1}'` \
     && echo "$SHA256 ${BITCOIN_ARCHIVE}" | sha256sum -c - \
-    && gpg --no-tty  --import ./laanwj-releases.asc \
-    && gpg --no-tty  --verify SHA256SUMS.asc \
+    && gpg --no-tty --import ./laanwj-releases.asc || gpg --no-tty --import ./laanwj-releases.asc \
+    && gpg --no-tty --verify SHA256SUMS.asc \
     && tar -xzf ${BITCOIN_ARCHIVE} -C /usr/local --strip-components=1 --exclude=*-qt \
     && rm -rf /tmp/* \
-    && bitcoind --version    
+    && bitcoind --version
 
 # create user and data directory
 RUN set -ex \
