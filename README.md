@@ -1,4 +1,4 @@
-# Lightning Node Docker Container Stack
+# Bitcoin/Lightning DockerFile
 
 Repo for spinning up your own Lightning Node Stack (bitcoind, lnd, neutrino) with docker
 
@@ -9,22 +9,25 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 |Key|Default Values|Info|Required|Editable|
 |---|---|---|---|---|
 |BITCOIN_VERSION|n/a|Bitcoin version to use [Support Versions](conf/supported_versions/bitcoind.txt)|yes|yes|
-|USER_ID|1000|The run container as bitcoin UID. Make this the same as the local directory UID permissions|no|yes|
+|USER_ID|`1000`|The run container as bitcoin UID. Make this the same as the local directory UID permissions|no|yes|
 |RELEASE_PGP|[laanwj-releases.asc](https://raw.githubusercontent.com/bitcoin-dot-org/Bitcoin.org/master/laanwj-releases.asc)|The Signed Release PGP Public Key|no|yes|
 
 ### Container Environment Values
 -----
 |Key|Default Values|Info|
 |---|---|---|
-|BITCOIN_RPC_ALLOWED|127.0.0.1|RPC Whitelist IPs addresses|
-|BITCOIN_RPC_USER|bitcoin|The Bitcoin RPC user|
-|BITCOIN_RPC_PASSWORD|password |The Bitcoin RPC password|
-|BITCOIN_RPC_PORT|18332|Bitcoin RPC Port |
-|BITCOIN_SERVER|1|Enable/Disable Bitcoin server|
-|LISTEN|1|Enable/Disable bitcoin to listen|
-|BITCOIN_TESTNET|1|Enable/Disable testnet|
-|ZMQ_PUB_RAW_TX|tcp://127.0.0.1:28332|The ZeroMQ raw publisher transactions URL|
-|ZMQ_PUB_RAW_BLK|tcp://127.0.0.1:28333|The ZeroMQ raw publisher blocks URL|
+|DEBUG|`0`|Enable/Disable Debug logging mode|
+|SELF_MANAGED|`true`|When `true` the bitcoin.conf is self managed, if `false` file is controlled by Docker|
+|BITCOIN_RPC_ALLOWED|`127.0.0.1`|RPC Whitelist IPs addresses|
+|BITCOIN_RPC_USER|`bitcoin`|The Bitcoin RPC user|
+|BITCOIN_RPC_PASSWORD|`password`|The Bitcoin RPC password|
+|BITCOIN_RPC_PORT|`18332`|Bitcoin RPC Port|
+|BITCOIN_RPC_BIND|`127.0.0.1`|RPC BIND address|
+|BITCOIN_SERVER|`1`|Enable/Disable Bitcoin server|
+|LISTEN|`1`|Enable/Disable bitcoin to listen|
+|BITCOIN_TESTNET|`1`|Enable/Disable testnet|
+|ZMQ_PUB_RAW_TX|`tcp://127.0.0.1:28332`|The ZeroMQ raw publisher transactions URL|
+|ZMQ_PUB_RAW_BLK|`tcp://127.0.0.1:28333`|The ZeroMQ raw publisher blocks URL|
 ---
 ### Docker Build
 ---
@@ -36,11 +39,12 @@ Build with different UID
 docker build --build-arg USER_ID=1001 -t bitcoind .
 ```
 ---
-Run bitcoind
+Run bitcoind with DEBUG enabled
 
 ```bash
-docker run --name bitcoind -d \
-    -v {local.bitcoin.dir}:/data \
+docker run --name bitcoind \
+    -e DEBUG=1 \
+    -v $(pwd):/data \
     -p 127.0.0.1:18332:18332 \
     -p 127.0.0.1:28332:28332 \
     -p 127.0.0.1:28333:28333 \
