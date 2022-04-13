@@ -9,10 +9,12 @@ SELF_MANAGED=${SELF_MANAGED:="true"}
 # Set testnet section configs
 if [[ "${BITCOIN_TESTNET}" == "1" ]]; then
   OPTS=$(echo -e "[test]\nrpcport=${BITCOIN_RPC_PORT:-18332} \
-    \nrpcbind=${BITCOIN_RPC_BIND:-"127.0.0.1:${BITCOIN_RPC_PORT-:18332}"}")
+    \nrpcbind=${BITCOIN_RPC_BIND:-"127.0.0.1"}"
+    )
 else
   OPTS=$(echo -e "rpcport=${BITCOIN_RPC_PORT:-8332} \
-    \nrpcbind=${BITCOIN_RPC_BIND-"127.0.0.1:${BITCOIN_RPC_PORT-:8332}"}")
+    \nrpcbind=${BITCOIN_RPC_BIND:-"127.0.0.1"}"
+    )
 fi
 
 if [[ ! -s "${DATA_DIR}/bitcoin.conf" || ${SELF_MANAGED} == "false" ]]; then
@@ -20,6 +22,7 @@ if [[ ! -s "${DATA_DIR}/bitcoin.conf" || ${SELF_MANAGED} == "false" ]]; then
 cat <<-EOF > ${DATA_DIR}/bitcoin.conf
 # This file was created by Docker.
 # You can override this file with your changes.
+# To override this file set SELF_MANAGED=true via docker envs
 debug=${DEBUG:-0}
 printtoconsole=1
 rpcallowip=${BITCOIN_RPC_ALLOWED:-127.0.0.1}

@@ -1,6 +1,8 @@
-# Bitcoin/Lightning DockerFile
+# Bitcoin/Lightning Dockerfile
 
-Repo for spinning up your own Lightning Node Stack (bitcoind, lnd, neutrino) with docker
+Repo for spinning up your own Bitcoin and Lightning Standalone Docker Containers (bitcoind, lnd, neutrino)
+
+_N.B Testnet is enabled by default._
 
 Bitcoin (bitcoind) Container 
 ---
@@ -10,7 +12,8 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 |---|---|---|---|---|
 |BITCOIN_VERSION|n/a|Bitcoin version to use [Support Versions](conf/supported_versions/bitcoind.txt)|yes|yes|
 |USER_ID|`1000`|The run container as bitcoin UID. Make this the same as the local directory UID permissions|no|yes|
-|RELEASE_PGP|[laanwj-releases.asc](https://raw.githubusercontent.com/bitcoin-dot-org/Bitcoin.org/master/laanwj-releases.asc)|The Signed Release PGP Public Key|no|yes|
+|PGP_KEY_SERVER|`hkps://keyserver.ubuntu.com`|OpenPGP [keyserver](https://keyserver.ubuntu.com) |no|yes
+|RELEASE_PGP_SIGNATURE|"`71A3B16735405025D447E8F274810B012346C9A6 01EA5486DE18A882D4C2684590C8019E36C2E964`"|The releases PGP key IDs ([see](https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/builder-keys/keys.txt))|no|yes|
 
 ### Container Environment Values
 -----
@@ -36,7 +39,7 @@ docker build --build-arg BITCOIN_VERSION=0.16.3 -t bitcoind .
 ```
 Build with different UID
 ```bash
-docker build --build-arg USER_ID=1001 -t bitcoind .
+docker build --build-arg USER_ID=1001 --build-arg BITCOIN_VERSION=0.16.3 -t bitcoind .
 ```
 ---
 Run bitcoind with DEBUG enabled
