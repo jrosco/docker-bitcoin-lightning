@@ -2,59 +2,99 @@
 
 Repo for spinning up your own Bitcoin and Lightning Standalone Docker Containers (bitcoind, lnd, neutrino)
 
-_N.B Testnet is enabled by default._
+_**N.B Testnet is enabled by default**_
 
-Bitcoin (bitcoind) Container 
+## Bitcoin (bitcoind) Container
+
 ---
 See [Dockerfile](./docker/bitcoind/Dockerfile)
+
 ### Dockerfile Argument Values
+
 |Key|Default Values|Info|Required|Editable|
 |---|---|---|---|---|
-|BITCOIN_VERSION|n/a|Bitcoin version to use [Support Versions](conf/supported_versions/bitcoind.txt)|yes|yes|
+|PLATFORM|`x86_64-linux-gnu`|The containers OS platform (included in the bitcoin archive files)|no|no|
+|BITCOIN_VERSION|`22.0`|Bitcoin version to use [Support Versions](conf/supported_versions/bitcoind.txt)|no|yes|
 |USER_ID|`1000`|The run container as bitcoin UID. Make this the same as the local directory UID permissions|no|yes|
 |PGP_KEY_SERVER|`hkps://keyserver.ubuntu.com`|OpenPGP [keyserver](https://keyserver.ubuntu.com) |no|yes
-|RELEASE_PGP_SIGNATURE|"`71A3B16735405025D447E8F274810B012346C9A6 01EA5486DE18A882D4C2684590C8019E36C2E964`"|The releases PGP key IDs ([see](https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/builder-keys/keys.txt))|no|yes|
+|RELEASE_PGP_SIGNATURE|[release keys](https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/builder-keys/keys.txt)|The releases PGP key IDs ([see](https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/builder-keys/keys.txt))|no|yes|
 
 ### Container Environment Values
------
+
+---
 |Key|Default Values|Info|
 |---|---|---|
 |DEBUG|`0`|Enable/Disable Debug logging mode|
-|SELF_MANAGED|`true`|When `true` the bitcoin.conf is self managed, if `false` file is controlled by Docker|
-|BITCOIN_RPC_ALLOWED|`127.0.0.1`|RPC Whitelist IPs addresses|
-|BITCOIN_RPC_USER|`bitcoin`|The Bitcoin RPC user|
-|BITCOIN_RPC_PASSWORD|`password`|The Bitcoin RPC password|
-|BITCOIN_RPC_PORT|`18332`|Bitcoin RPC Port|
-|BITCOIN_RPC_BIND|`127.0.0.1`|RPC BIND address|
-|BITCOIN_SERVER|`1`|Enable/Disable Bitcoin server|
 |LISTEN|`1`|Enable/Disable bitcoin to listen|
-|BITCOIN_TESTNET|`1`|Enable/Disable testnet|
+|SERVER|`1`|Enable/Disable Bitcoin server|
+|TESTNET|`1`|Enable/Disable testnet|
+|SELF_MANAGED|`true`|When `true` the bitcoin.conf is self managed, if `false` file is controlled by Docker|
+|RPC_ALLOWED|`127.0.0.1`|RPC Whitelist IPs addresses|
+|RPC_USER|`bitcoin`|The Bitcoin RPC user|
+|RPC_PASSWORD|`password`|The Bitcoin RPC password (_**IMPORTANT: ensure you update this**_)|
+|RPC_PORT|`18332`|Bitcoin RPC Port|
+|RPC_BIND|`127.0.0.1`|RPC BIND address|
+|TX_INDEX|`0`|Maintain a full transaction index|
+|BLOCK_FILTER_INDEX|`0`|Store and retrieve block filters, hashes, and headers|
 |ZMQ_PUB_RAW_TX|`tcp://127.0.0.1:28332`|The ZeroMQ raw publisher transactions URL|
-|ZMQ_PUB_RAW_BLK|`tcp://127.0.0.1:28333`|The ZeroMQ raw publisher blocks URL|
+|ZMQ_PUB_RAW_BLK|`tcp://127.0.0.1:28333`|The ZeroMQ raw publisher blocks URL|11
 ---
+
 ### Docker Build
+
 ---
-```bash
-docker build --build-arg BITCOIN_VERSION=0.16.3 -t bitcoind .
-```
-Build with different UID
-```bash
-docker build --build-arg USER_ID=1001 --build-arg BITCOIN_VERSION=0.16.3 -t bitcoind .
-```
----
-Run bitcoind with DEBUG enabled
+Build latest version
 
 ```bash
-docker run --name bitcoind \
-    -e DEBUG=1 \
-    -v $(pwd):/data \
+docker build -t bitcoind .
+```
+
+Build older versions `<=0.21.2` (old [release key](https://raw.githubusercontent.com/bitcoin-dot-org/Bitcoin.org/master/laanwj-releases.asc))
+
+See [supported versions](conf/supported_versions/bitcoind.txt)
+
+```bash
+docker build \
+  --build-arg BITCOIN_VERSION=0.16.3 \
+  --build-arg RELEASE_PGP_SIGNATURE=01EA5486DE18A882D4C2684590C8019E36C2E964 \
+  -t bitcoind .
+```
+
+Build with different UID
+
+```bash
+docker build --build-arg USER_ID=1001 -t bitcoind .
+```
+
+### Docker Create Volume
+
+---
+Create a persistent volume
+
+```bash
+docker volume create --name bitcoind
+```
+
+See volume details
+
+```bash
+docker volume inspect bitcoind
+```
+
+### Docker Run
+
+Run bitcoind with persistent volume
+
+```bash
+docker run -it --name bitcoind \
+    -v bitcoind:/home/bitcoin \
     -p 127.0.0.1:18332:18332 \
     -p 127.0.0.1:28332:28332 \
     -p 127.0.0.1:28333:28333 \
     bitcoind
 ```
 
-Lightning (lnd) Container
+## Lightning (lnd) Container
 ---
 See [Dockerfile](./docker/lnd/Dockerfile)
 ### Dockerfile Argument Values
