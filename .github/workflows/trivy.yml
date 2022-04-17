@@ -24,18 +24,15 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
     name: scan_build
     runs-on: "ubuntu-18.04"
-    env:
-      btc_version: "0.17.0"
-      release_key: "01EA5486DE18A882D4C2684590C8019E36C2E964"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build an image from Dockerfile
+      - name: Bitcoind - Build an image from Dockerfile
         run: |
-          docker build --build-arg BITCOIN_VERSION=$btc_version --build-arg RELEASE_PGP_SIGNATURE=$release_key -t bitcoind:${{ github.sha }} docker/bitcoind/
+          docker build -t bitcoind:${{ github.sha }} docker/bitcoind/
 
-      - name: Run Trivy vulnerability scanner
+      - name: Bitcoind - Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@2a2157eb22c08c9a1fac99263430307b8d1bc7a2
         with:
           image-ref: 'bitcoind:${{ github.sha }}'
@@ -44,7 +41,25 @@ jobs:
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Bitcoind - Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Lnd - Build an image from Dockerfile
+        run: |
+          docker build -t lnd:${{ github.sha }} docker/lnd/
+
+      - name: Lnd - Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@2a2157eb22c08c9a1fac99263430307b8d1bc7a2
+        with:
+          image-ref: 'lnd:${{ github.sha }}'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Lnd - Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
