@@ -26,18 +26,19 @@ jobs:
     runs-on: "ubuntu-18.04"
     env:
       btc_version: "0.17.0"
+      release_key: "01EA5486DE18A882D4C2684590C8019E36C2E964"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Build an image from Dockerfile
         run: |
-          docker build --build-arg BITCOIN_VERSION=$btc_version -t docker.io/jrosco/bitcoind:${{ github.sha }} docker/bitcoind/
+          docker build --build-arg BITCOIN_VERSION=$btc_version --build-arg RELEASE_PGP_SIGNATURE=$release_key -t bitcoind:${{ github.sha }} docker/bitcoind/
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@2a2157eb22c08c9a1fac99263430307b8d1bc7a2
         with:
-          image-ref: 'docker.io/jrosco/bitcoind:${{ github.sha }}'
+          image-ref: 'bitcoind:${{ github.sha }}'
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
