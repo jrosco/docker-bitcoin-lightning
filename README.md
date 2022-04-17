@@ -9,7 +9,7 @@ _**N.B Testnet is enabled by default**_
 ---
 See [Dockerfile](./docker/bitcoind/Dockerfile)
 
-### Dockerfile Argument Values
+### Dockerfile Argument Values - bitcoind
 
 |Key|Default Values|Info|Required|Editable|
 |---|---|---|---|---|
@@ -19,7 +19,7 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 |PGP_KEY_SERVER|`hkps://keyserver.ubuntu.com`|OpenPGP [keyserver](https://keyserver.ubuntu.com) |no|yes
 |RELEASE_PGP_SIGNATURE|[release keys](https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/builder-keys/keys.txt)|The releases PGP key IDs ([see](https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/builder-keys/keys.txt))|no|yes|
 
-### Container Environment Values
+### Container Environment Values - bitcoind
 
 ---
 |Key|Default Values|Info|
@@ -40,7 +40,7 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 |ZMQ_PUB_RAW_BLK|`tcp://127.0.0.1:28333`|The ZeroMQ raw publisher blocks URL|11
 ---
 
-### Docker Build
+### Docker Build - bitcoind
 
 ---
 Build latest version
@@ -66,7 +66,7 @@ Build with different UID
 docker build --build-arg USER_ID=1001 -t bitcoind .
 ```
 
-### Docker Create Volume
+### Docker Create Volume - bitcoind
 
 ---
 Create a persistent volume
@@ -81,7 +81,7 @@ See volume details
 docker volume inspect bitcoind
 ```
 
-### Docker Run
+### Docker Run - bitcoind
 
 Run bitcoind with persistent volume
 
@@ -95,15 +95,22 @@ docker run -it --name bitcoind \
 ```
 
 ## Lightning (lnd) Container
+
 ---
 See [Dockerfile](./docker/lnd/Dockerfile)
-### Dockerfile Argument Values
-|Key|Default Values|Info|
-|---|---|---|
-|LND_VERSION|v0.5.2-beta|Lightning version to use|
-|USER_ID|1000|The run container as bitcoin UID. Make this the same as the local directory UID permissions|
 
-### Container Environment Values
+### Dockerfile Argument Values - lnd
+
+|Key|Default Values|Info|Required|Editable|
+|---|---|---|---|---|
+|PLATFORM|`linux-amd64`|The containers OS platform|no|no|
+|LND_VERSION|`v0.13.3-beta`|Lightning version to use|no|yes|
+|USER_ID|`1000`|The run container as bitcoin UID. Make this the same as the local directory UID permissions|no|yes|
+|RELEASE_PGP_KEY|[roasbeef.asc](https://raw.githubusercontent.com/lightningnetwork/lnd/master/scripts/keys/roasbeef.asc)|The PGP key ID (info found on releases [page](https://github.com/lightningnetwork/lnd/releases))|no|yes|
+|RELEASE_SIG_KEY_FILE|`manifest-roasbeef-${LND_VERSION}.sig`|The signed key used with release (info found on releases [page](https://github.com/lightningnetwork/lnd/releases))|no|yes|
+
+### Container Environment Values - lnd
+
 
 |Key|Default Values|Info|
 |---|---|---|
@@ -117,36 +124,59 @@ See [Dockerfile](./docker/lnd/Dockerfile)
 |ZMQ_PUB_RAW_BLK|tcp://127.0.0.1:28333|The ZeroMQ raw publisher blocks URL|
 |LIGHTNING_DATA|/data/.lnd|The Lightning .lnd directory location|
 
-### Docker Build
+### Docker Build - lnd
+
 ---
+Build latest version
 
 ```bash
 docker build -t lnd .
 ```
+
 Build with differnet Lightning version
+
 ```bash
-docker build --build-arg LND_VERSION=v0.5-beta -t lnd .
+docker build --build-arg LND_VERSION=v0.12.1-beta -t lnd .
 ```
+
 Build with different UID
+
 ```bash
 docker build --build-arg USER_ID=1001 -t lnd .
 ```
+
+### Docker Create Volume - lnd
+
 ---
+Create a persistent volume
+
+```bash
+docker volume create --name lnd
+```
+
+See volume details
+
+```bash
+docker volume inspect lnd
+```
+
+### Docker Run - lnd
+
 Run Lightning with Bitcoin Backend
 
 ```bash
 docker run --rm --name lnd --network container:bitcoind -d \
-    -v {local.bitcoin.dir}:/data \
+    -v lnd:/data \
     -v :/data/.lnd \
     lnd
 ```
+
 Run Lightning with Neutrino Backend
 
 ```bash
-docker run --rm --name lnd -d \
+docker run --rm --name lnd \
     -e BACKEND=neutrino \
-    -v {local.lightning.dir}:/data \
-    -v :/data/.lnd \
+    -v lnd:/data \
     lnd
 ```
 

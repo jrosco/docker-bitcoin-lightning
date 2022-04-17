@@ -1,37 +1,53 @@
-FROM golang:1.13-alpine as builder
+# FROM golang:alpine3.15 as builder
+FROM alpine:3.15.4 as builder
 
-ARG LND_VERSION
+ARG LND_VERSION=v0.13.3-beta
+ARG PLATFORM=linux-amd64
+ARG RELEASE_PGP_KEY=https://raw.githubusercontent.com/lightningnetwork/lnd/master/scripts/keys/roasbeef.asc
+ARG RELEASE_SIG_KEY_FILE=manifest-roasbeef-${LND_VERSION}.sig
 
-# Force Go to use the cgo based DNS resolver. This is required to ensure DNS
-# queries required to connect to linked containers succeed.
-ENV GODEBUG netdns=cgo
+ENV DOWNLOAD_URL=https://github.com/lightningnetwork/lnd/releases/download
 
 # Install dependencies and install/build lnd.
-RUN apk add --no-cache --update alpine-sdk \
-  git \
-  make
+RUN set -ex \
+    && apk add --no-cache --update \
+      alpine-sdk \
+      curl \
+      gnupg
 
-RUN git clone https://github.com/lightningnetwork/lnd /go/src/github.com/lightningnetwork/lnd \ 
-  && cd /go/src/github.com/lightningnetwork/lnd \
-  && git checkout tags/${LND_VERSION} \
-  && make \
-  && make install
+# import pgp keys and checksums
+RUN set -ex \
+  && curl ${RELEASE_PGP_KEY} | gpg --import
 
-# Start a new, final image to reduce size.
-FROM alpine as final
+# build lnd via downloads
+RUN set -ex \
+    && cd /tmp \
+    && wget -q ${DOWNLOAD_URL}/${LND_VERSION}/lnd-${PLATFORM}-${LND_VERSION}.tar.gz \
+    && wget -q ${DOWNLOAD_URL}/${LND_VERSION}/${RELEASE_SIG_KEY_FILE} \
+    && wget -q ${DOWNLOAD_URL}/${LND_VERSION}/manifest-${LND_VERSION}.txt \
+    && tar xvf lnd-${PLATFORM}-${LND_VERSION}.tar.gz \
+    && lnd-${PLATFORM}-${LND_VERSION}/lnd --version \
+    && grep lnd-${PLATFORM}-${LND_VERSION} manifest-${LND_VERSION}.txt | sha256sum -c \
+    && gpg --verify *.sig manifest-${LND_VERSION}.txt \
+    && mv lnd-${PLATFORM}-${LND_VERSION} lnd/
+
+# Start a new, final image to reduce size
+FROM alpine:3.15.4 as final
 
 ARG USER_ID=1000
 
-# Copy the binaries and entrypoint from the builder image.
-COPY --from=builder /go/bin/lncli /bin/
-COPY --from=builder /go/bin/lnd /bin/
+# Copy the binaries from the builder image.
+COPY --from=builder /tmp/lnd/lncli /bin/
+COPY --from=builder /tmp/lnd/lnd /bin/
 
-RUN addgroup -g ${USER_ID} bitcoin \
-  && adduser -u ${USER_ID} -D -G bitcoin -h /data -s /bin/sh bitcoin
+RUN set -ex \
+    && addgroup -g ${USER_ID} bitcoin \
+    && adduser -u ${USER_ID} -D -G bitcoin -h /data -s /bin/sh bitcoin
 
 # Add bash.
-RUN apk add --no-cache \
-  bash
+RUN set -ex \
+    && apk add --no-cache \
+      bash
 
 # Copy the entrypoint script.
 COPY docker-entrypoint.sh /docker-entrypoint.sh
