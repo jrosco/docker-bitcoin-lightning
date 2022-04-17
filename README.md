@@ -162,16 +162,16 @@ docker volume inspect lnd
 
 ### Docker Run - lnd
 
-Run Lightning with Bitcoin Backend
+Run lnd with bitcoind container
 
 ```bash
-docker run --rm --name lnd --network container:bitcoind -d \
+docker run --rm --name lnd \
+    --network container:bitcoind \
     -v lnd:/data \
-    -v :/data/.lnd \
     lnd
 ```
 
-Run Lightning with Neutrino Backend
+Run lnd with neutrino backend
 
 ```bash
 docker run --rm --name lnd \
@@ -180,7 +180,7 @@ docker run --rm --name lnd \
     lnd
 ```
 
-Build you own LND certificate:
+Build you own certificates:
 
 ---
 
