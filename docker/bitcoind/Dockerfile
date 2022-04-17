@@ -76,8 +76,6 @@ RUN set -ex \
 
 ADD docker-entrypoint.sh /
 
-VOLUME /data
-
 # mainnet and testnet ports (rpc, http)
 EXPOSE 8332 8333 18332 18333
 
