@@ -1,8 +1,7 @@
-FROM debian:bullseye-slim
+FROM debian:bullseye-slim AS builder
 
 ARG PLATFORM=x86_64-linux-gnu
 ARG BITCOIN_VERSION=22.0
-ARG USER_ID=1000
 ARG PGP_KEY_SERVER=hkps://keyserver.ubuntu.com
 ARG RELEASE_PGP_SIGNATURE="\
     0CCBAAFD76A2ECE2CCD3141DE2FFD5B1D88CA97D \
@@ -21,17 +20,13 @@ ARG RELEASE_PGP_SIGNATURE="\
     "
 
 ENV BITCOIN_ARCHIVE=bitcoin-${BITCOIN_VERSION}-${PLATFORM}.tar.gz
-ENV DATA_DIR=/home/bitcoin/.bitcoin
 
-WORKDIR $DATA_DIR
+WORKDIR /tmp
 
-# install required packages
+# install required packages for builder
 RUN set -ex \
     && apt-get update \
-    && apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu gnupg wget procps \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean \
-    && apt-get autoclean
+    && apt-get install -qq --no-install-recommends ca-certificates dirmngr gnupg wget
 
 # add bitcoin version as integer to file in container
 RUN echo ${BITCOIN_VERSION} | sed -e s/\\.//g > /version
@@ -44,7 +39,6 @@ RUN set -ex \
 
 # download bitcoin and verify
 RUN set -ex \
-    && cd /tmp \
     && wget -q https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/${BITCOIN_ARCHIVE} \
     && wget -q https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/SHA256SUMS.asc \
     && \
@@ -57,18 +51,33 @@ RUN set -ex \
     && echo "${SHA256} ${BITCOIN_ARCHIVE}" | sha256sum -c - \
     && gpg --no-tty --verify SHA256SUMS.asc
 
-# install bitcoin binaries
+# uncompress bitcoin binaries to builder container
 RUN set -ex \
-    && cd /tmp \
-    && tar -xzf ${BITCOIN_ARCHIVE} -C /usr/local --strip-components=1 --exclude=*-qt \
+    && mkdir /tmp/builder \
+    && tar -xzf ${BITCOIN_ARCHIVE} -C /tmp/builder --strip-components=1 --exclude=*-qt
+
+FROM debian:bullseye-slim
+
+ARG USER_ID=1000
+ENV DATA_DIR=/home/bitcoin/.bitcoin
+
+# copy binaries from builder container
+COPY --from=builder /tmp/builder /usr/local/
+
+WORKDIR $DATA_DIR
+
+# install required packages
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu procps \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && apt-get autoclean
+
+RUN set -ex \
     && bitcoind --version \
     && test -e /usr/local/bin/test_bitcoin && /usr/local/bin/test_bitcoin --show_progress \
     || echo "no test cases found"
-
-# cleanup files 
-RUN set -ex \
-    && rm -rf /tmp/* \
-    && apt-get remove wget gnupg --yes || apt-get autoremove --yes \
 
 # create user and data directory
 RUN set -ex \
