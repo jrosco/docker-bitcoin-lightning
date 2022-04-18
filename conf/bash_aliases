@@ -1,5 +1,0 @@
-alias btc-logs='docker logs bitcoind --tail 10 -f' 
-alias lnd-logs='docker logs lightning --tail 10 -f'
-alias elect-logs='docker logs electrumx --tail 10 -f'
-alias btc-cli='docker exec -it bitcoind su bitcoin -c "bitcoin-cli $@"' 
-alias lnd-cli='docker exec -it lightning su bitcoin -c "lncli $@"' 

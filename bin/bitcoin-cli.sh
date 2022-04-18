@@ -1,1 +1,3 @@
-docker exec -ti -u bitcoin bitcoind bitcoin-cli "$@"
+#!/bin/sh
+
+docker exec -it -u bitcoin bitcoind bitcoin-cli "$@"
