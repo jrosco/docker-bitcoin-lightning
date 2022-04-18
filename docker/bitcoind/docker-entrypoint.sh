@@ -2,17 +2,17 @@
 
 set -e
 
-BITCOIN_TESTNET=${BITCOIN_TESTNET:="1"}
+TESTNET=${TESTNET:="1"}
 SELF_MANAGED=${SELF_MANAGED:="true"}
 
 # Set testnet section configs
-if [[ "${BITCOIN_TESTNET}" == "1" ]]; then
-  OPTS=$(echo -e "[test]\nrpcport=${BITCOIN_RPC_PORT:-18332} \
-    \nrpcbind=${BITCOIN_RPC_BIND:-"127.0.0.1"}"
+if [[ "${TESTNET}" == "1" ]]; then
+  OPTS=$(echo -e "[test]\nrpcport=${RPC_PORT:-18332} \
+    \nrpcbind=${RPC_BIND:-"127.0.0.1"}"
     )
 else
-  OPTS=$(echo -e "rpcport=${BITCOIN_RPC_PORT:-8332} \
-    \nrpcbind=${BITCOIN_RPC_BIND:-"127.0.0.1"}"
+  OPTS=$(echo -e "rpcport=${RPC_PORT:-8332} \
+    \nrpcbind=${RPC_BIND:-"127.0.0.1"}"
     )
 fi
 
@@ -24,12 +24,12 @@ cat <<-EOF > "$DATA_DIR/bitcoin.conf"
 # To override this file set SELF_MANAGED=true via docker envs
 printtoconsole=1
 debug=${DEBUG:-0}
-server=${BITCOIN_SERVER:-1}
+server=${SERVER:-1}
 listen=${LISTEN:-1}
-testnet=${BITCOIN_TESTNET}
-rpcallowip=${BITCOIN_RPC_ALLOWED:-127.0.0.1}
-rpcpassword=${BITCOIN_RPC_PASSWORD:-password}
-rpcuser=${BITCOIN_RPC_USER:-bitcoin}
+testnet=${TESTNET}
+rpcallowip=${RPC_ALLOWED:-127.0.0.1}
+rpcpassword=${RPC_PASSWORD:-password}
+rpcuser=${RPC_USER:-bitcoin}
 txindex=${TX_INDEX:-0}
 blockfilterindex=${BLOCK_FILTER_INDEX:-0}
 zmqpubrawblock=${ZMQ_PUB_RAW_BLK:-"tcp://127.0.0.1:28333"}
