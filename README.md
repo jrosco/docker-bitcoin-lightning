@@ -72,13 +72,13 @@ docker build --build-arg USER_ID=1001 -t bitcoind .
 Create a persistent volume
 
 ```bash
-docker volume create --name bitcoind
+docker volume create --name bitcoind-data
 ```
 
 See volume details
 
 ```bash
-docker volume inspect bitcoind
+docker volume inspect bitcoind-data
 ```
 
 ### Docker Run - bitcoind
@@ -87,7 +87,7 @@ Run bitcoind with persistent volume
 
 ```bash
 docker run -it --name bitcoind \
-    -v bitcoind:/home/bitcoin \
+    -v bitcoind-data:/home/bitcoin \
     -p 127.0.0.1:18332:18332 \
     -p 127.0.0.1:28332:28332 \
     -p 127.0.0.1:28333:28333 \
@@ -151,13 +151,13 @@ docker build --build-arg USER_ID=1001 -t lnd .
 Create a persistent volume
 
 ```bash
-docker volume create --name lnd
+docker volume create --name lnd-data
 ```
 
 See volume details
 
 ```bash
-docker volume inspect lnd
+docker volume inspect lnd-data
 ```
 
 ### Docker Run - lnd
@@ -167,7 +167,7 @@ Run lnd with bitcoind container
 ```bash
 docker run --rm --name lnd \
     --network container:bitcoind \
-    -v lnd:/data \
+    -v lnd-data:/data \
     lnd
 ```
 
@@ -176,7 +176,7 @@ Run lnd with neutrino backend
 ```bash
 docker run --rm --name lnd \
     -e BACKEND=neutrino \
-    -v lnd:/data \
+    -v lnd-data:/data \
     lnd
 ```
 
