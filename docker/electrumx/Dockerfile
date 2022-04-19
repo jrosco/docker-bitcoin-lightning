@@ -27,7 +27,7 @@ RUN set -ex \
     && mkdir /tmp/ssl \
     && cd /tmp/ssl \
     && openssl genrsa -out electrumx.key 2048 \
-    && openssl req -new -key electrumx.key -out electrumx.csr -subj '/CN=localhost/O=electrumx./C=US' \
+    && openssl req -new -key electrumx.key -out electrumx.csr -subj '/CN=localhost/O=electrumx/C=US' \
     && openssl x509 -req -days 1825 -in electrumx.csr -signkey electrumx.key -out electrumx.crt
 
 FROM python:3.9.12-slim-buster
