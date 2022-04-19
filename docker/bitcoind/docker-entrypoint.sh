@@ -32,8 +32,10 @@ rpcpassword=${RPC_PASSWORD:-password}
 rpcuser=${RPC_USER:-bitcoin}
 txindex=${TX_INDEX:-0}
 blockfilterindex=${BLOCK_FILTER_INDEX:-0}
-zmqpubrawblock=${ZMQ_PUB_RAW_BLK:-"tcp://127.0.0.1:28333"}
-zmqpubrawtx=${ZMQ_PUB_RAW_TX:-"tcp://127.0.0.1:28332"}
+zmqpubrawblock=${ZEROMQ_BLOCK_URL:-"tcp://127.0.0.1:28000"}
+zmqpubhashblock=${ZEROMQ_BLOCK_URL:-"tcp://127.0.0.1:28000"}
+zmqpubrawtx=${ZEROMQ_TX_URL:-"tcp://127.0.0.1:29000"}
+zmqpubhashtx=${ZEROMQ_TX_URL:-"tcp://127.0.0.1:29000"}
 ${OPTS}
 EOF
   chown -R bitcoin:bitcoin "$DATA_DIR"

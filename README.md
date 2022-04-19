@@ -36,8 +36,8 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 |RPC_BIND|`127.0.0.1`|RPC BIND address|
 |TX_INDEX|`0`|Maintain a full transaction index|
 |BLOCK_FILTER_INDEX|`0`|Store and retrieve block filters, hashes, and headers|
-|ZMQ_PUB_RAW_TX|`tcp://127.0.0.1:28332`|The ZeroMQ raw publisher transactions URL|
-|ZMQ_PUB_RAW_BLK|`tcp://127.0.0.1:28333`|The ZeroMQ raw publisher blocks URL|11
+|ZEROMQ_BLOCK_URL|`tcp://127.0.0.1:28000`|The ZeroMQ block messaging interface URL|
+|ZEROMQ_TX_URL|`tcp://127.0.0.1:29000`|The ZeroMQ transactions messaging interface URL|
 ---
 
 ### Docker Build - bitcoind
@@ -89,8 +89,8 @@ Run bitcoind with persistent volume
 docker run -it --name bitcoind \
     -v bitcoind-data:/home/bitcoin \
     -p 127.0.0.1:18332:18332 \
-    -p 127.0.0.1:28332:28332 \
-    -p 127.0.0.1:28333:28333 \
+    -p 127.0.0.1:28000:28000 \
+    -p 127.0.0.1:29000:29000 \
     bitcoind
 ```
 
@@ -120,9 +120,9 @@ See [Dockerfile](./docker/lnd/Dockerfile)
 |NETWORK|testnet|Which network to use (testnet,simnet,mainnet)|
 |CHAIN|bitcoin|Which blockchain to use (bitcoin,litecoin)|
 |BACKEND|bitcoind|Which backend to use (bitcoind,btcd,litecoind,ltcd,neutrino )|
-|ZMQ_PUB_RAW_TX|tcp://127.0.0.1:28332|The ZeroMQ raw publisher transactions URL|
-|ZMQ_PUB_RAW_BLK|tcp://127.0.0.1:28333|The ZeroMQ raw publisher blocks URL|
 |LIGHTNING_DATA|/data/.lnd|The Lightning .lnd directory location|
+|BITCOIN_ZEROMQ_BLOCK_URL|`tcp://127.0.0.1:28000`|The ZeroMQ block messaging interface URL|
+|BITCOIN_ZEROMQ_TX_URL|`tcp://127.0.0.1:29000`|The ZeroMQ transactions messaging interface URL|
 
 ### Docker Build - lnd
 

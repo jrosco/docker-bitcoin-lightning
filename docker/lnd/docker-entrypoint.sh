@@ -11,8 +11,8 @@ DEBUG=${DEBUG:-info}
 NETWORK=${NETWORK:-testnet}
 CHAIN=${CHAIN:-bitcoin}
 BACKEND=${BACKEND:-bitcoind}
-ZMQ_PUB_RAW_TX=${ZMQ_PUB_RAW_TX:-"tcp://127.0.0.1:28332"}
-ZMQ_PUB_RAW_BLK=${ZMQ_PUB_RAW_BLK:-"tcp://127.0.0.1:28333"}
+BITCOIN_ZEROMQ_BLOCK_URL=${BITCOIN_ZEROMQ_BLOCK_URL:-"tcp://127.0.0.1:28000"}
+BITCOIN_ZEROMQ_TX_URL=${BITCOIN_ZEROMQ_TX_URL:-"tcp://127.0.0.1:29000"}
 LIGHTNING_DATA=${LIGHTNING_DATA:-"/data/.lnd"}
 
 COMMON_PARAMS=$(echo \
@@ -35,8 +35,8 @@ fi
 
 if echo ${BACKEND}|grep -q 'bitcoind\|litecoind'; then
     ZMQ_PARAMS=$(echo \
-    "--${BACKEND}.zmqpubrawblock=${ZMQ_PUB_RAW_TX}" \
-    "--${BACKEND}.zmqpubrawtx=${ZMQ_PUB_RAW_BLK}" \
+    "--${BACKEND}.zmqpubrawblock=${BITCOIN_ZEROMQ_BLOCK_URL}" \
+    "--${BACKEND}.zmqpubrawtx=${BITCOIN_ZEROMQ_TX_URL}" \
     )
 fi
 
