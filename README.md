@@ -111,9 +111,9 @@ See [Dockerfile](./docker/lnd/Dockerfile)
 
 ### Container Environment Values - lnd
 
-
 |Key|Default Values|Info|
 |---|---|---|
+|BITCOIN_RPC_HOST|localhost|Bitcoin RPC host|
 |BITCOIN_RPC_USER|bitcoin|The Bitcoin RPC user|
 |BITCOIN_RPC_PASSWORD|password |The Bitcoin RPC password|
 |DEBUG|info|Logging level|
