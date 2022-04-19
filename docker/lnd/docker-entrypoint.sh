@@ -4,7 +4,7 @@
 set -e
 
 # Set default variables if needed.
-BITCOIN_RPC_HOST=${BITCOIN_RPC_HOST:-localhost}
+BITCOIN_RPC_HOST=${BITCOIN_RPC_HOST:-127.0.0.1}
 BITCOIN_RPC_USER=${BITCOIN_RPC_USER:-bitcoin}
 BITCOIN_RPC_PASSWORD=${BITCOIN_RPC_PASSWORD:-password}
 DEBUG=${DEBUG:-info}

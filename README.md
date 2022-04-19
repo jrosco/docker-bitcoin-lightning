@@ -113,7 +113,7 @@ See [Dockerfile](./docker/lnd/Dockerfile)
 
 |Key|Default Values|Info|
 |---|---|---|
-|BITCOIN_RPC_HOST|localhost|Bitcoin RPC host|
+|BITCOIN_RPC_HOST|127.0.0.1|Bitcoin RPC host|
 |BITCOIN_RPC_USER|bitcoin|The Bitcoin RPC user|
 |BITCOIN_RPC_PASSWORD|password |The Bitcoin RPC password|
 |DEBUG|info|Logging level|
@@ -165,7 +165,7 @@ docker volume inspect lnd-data
 Run lnd with bitcoind container
 
 ```bash
-docker run --rm --name lnd \
+docker run --name lnd \
     --network container:bitcoind \
     -v lnd-data:/data \
     lnd
@@ -174,7 +174,7 @@ docker run --rm --name lnd \
 Run lnd with neutrino backend
 
 ```bash
-docker run --rm --name lnd \
+docker run --name lnd \
     -e BACKEND=neutrino \
     -v lnd-data:/data \
     lnd
