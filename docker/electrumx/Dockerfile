@@ -1,6 +1,8 @@
 FROM python:3.9.12-slim-buster AS builder
 
 ARG VERSION=1.16.0
+ARG SSL_EXPIRY=1826
+ARG CREATE_SSL=true
 
 # install required packages
 RUN set -ex \
@@ -24,16 +26,21 @@ RUN set -ex \
 
 # create self signed ssl cert
 RUN set -ex \
-    && mkdir /tmp/ssl \
-    && cd /tmp/ssl \
-    && openssl genrsa -out electrumx.key 2048 \
-    && openssl req -new -key electrumx.key -out electrumx.csr -subj '/CN=localhost/O=electrumx/C=US' \
-    && openssl x509 -req -days 1825 -in electrumx.csr -signkey electrumx.key -out electrumx.crt
+    && \
+    if [ "${CREATE_SSL}" = "true" ]; then \
+      mkdir /tmp/ssl \
+      && cd /tmp/ssl \
+      && openssl genrsa -out electrumx.key 2048 \
+      && openssl req -new -key electrumx.key -out electrumx.csr -subj '/CN=localhost/O=electrumx/C=US' \
+      && openssl x509 -req -days ${SSL_EXPIRY} -in electrumx.csr -signkey electrumx.key -out electrumx.crt; \
+    fi
 
 FROM python:3.9.12-slim-buster
 
 ARG USER_ID=1000
 
+# https://electrumx.readthedocs.io/en/latest/environment.html#envvar-LOG_LEVEL
+ENV LOG_LEVEL info
 # https://electrumx.readthedocs.io/en/latest/environment.html#envvar-COIN
 ENV COIN BitcoinSegwit
 # https://electrumx.readthedocs.io/en/latest/environment.html#envvar-NET
@@ -46,10 +53,11 @@ ENV DB_DIRECTORY /home/electrumx
 ENV SERVICES tcp://:50001,ssl://:50002,wss://:50004,rpc://
 # https://electrumx.readthedocs.io/en/latest/environment.html#envvar-USERNAME
 ENV USERNAME electrumx
-
-ENV ALLOW_ROOT 1
+# https://electrumx.readthedocs.io/en/latest/environment.html#envvar-PEER_DISCOVERY
 ENV PEER_DISCOVERY on
+# https://electrumx.readthedocs.io/en/latest/environment.html#envvar-SSL_CERTFILE
 ENV SSL_CERTFILE /opt/electrumx/ssl/electrumx.crt
+# https://electrumx.readthedocs.io/en/latest/environment.html#envvar-SSL_CERTFILE
 ENV SSL_KEYFILE /opt/electrumx/ssl/electrumx.key
 
 WORKDIR /home/${USERNAME}
