@@ -40,6 +40,12 @@ if echo ${BACKEND}|grep -q 'bitcoind\|litecoind'; then
     )
 fi
 
+if [ "$SOCKS5_PROXY" != "" ]; then
+  EXTRA_PARAMS=$(echo \
+    "--tor.socks=$SOCKS5_PROXY"
+  )
+fi
+
 if [[ ! -s "${LIGHTNING_DATA}/lnd.conf" ]]; then
     mkdir -p ${LIGHTNING_DATA}; touch ${LIGHTNING_DATA}/lnd.conf
 cat <<-EOF > "${LIGHTNING_DATA}/lnd.conf"
@@ -57,4 +63,5 @@ fi
 su bitcoin -c "lnd ${COMMON_PARAMS} \
     ${BITCOIN_PARAMS} \
     ${ZMQ_PARAMS} \
+    ${EXTRA_PARAMS} \
     $@"
