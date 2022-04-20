@@ -38,6 +38,7 @@ See [Dockerfile](./docker/bitcoind/Dockerfile)
 |BLOCK_FILTER_INDEX|`0`|Store and retrieve block filters, hashes, and headers|
 |ZEROMQ_BLOCK_URL|`tcp://127.0.0.1:28000`|The ZeroMQ block messaging interface URL|
 |ZEROMQ_TX_URL|`tcp://127.0.0.1:29000`|The ZeroMQ transactions messaging interface URL|
+|PROXY|`none`|Proxy Server `addr:port`|
 ---
 
 ### Docker Build - bitcoind
@@ -123,6 +124,7 @@ See [Dockerfile](./docker/lnd/Dockerfile)
 |LIGHTNING_DATA|/data/.lnd|The Lightning .lnd directory location|
 |BITCOIN_ZEROMQ_BLOCK_URL|`tcp://127.0.0.1:28000`|The ZeroMQ block messaging interface URL|
 |BITCOIN_ZEROMQ_TX_URL|`tcp://127.0.0.1:29000`|The ZeroMQ transactions messaging interface URL|
+|SOCKS5_PROXY|`none`|The SOCKS5 Proxy used with TOR `addr:port`|
 
 ### Docker Build - lnd
 
